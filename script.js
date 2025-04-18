@@ -1,3 +1,5 @@
+Here’s the full and final script.js with all issues fixed:
+
 document.getElementById('search-button').addEventListener('click', () => {
     const query = document.getElementById('search-input').value.trim();
     if (!query) {
@@ -5,9 +7,8 @@ document.getElementById('search-button').addEventListener('click', () => {
         return;
     }
 
-    // Replace 'your-api-key' with your actual RapidAPI key
     const apiKey = '9f138744a5msh3a9eedcf419e464p1950b5jsn5b86cd60b9f8';
-    const apiUrl = `https://tasty.p.rapidapi.com/recipes/list?tags=${encodeURIComponent(query)}`;
+    const apiUrl = `https://tasty.p.rapidapi.com/recipes/list?from=0&size=10&q=${encodeURIComponent(query)}`;
 
     fetch(apiUrl, {
         method: 'GET',
@@ -19,18 +20,23 @@ document.getElementById('search-button').addEventListener('click', () => {
     .then(response => response.json())
     .then(data => {
         const resultsDiv = document.getElementById('results');
-        resultsDiv.innerHTML = ''; // Clear previous results
+        resultsDiv.innerHTML = '';
 
         if (data.results && data.results.length > 0) {
             data.results.forEach(recipe => {
                 const recipeDiv = document.createElement('div');
-                recipeDiv.classList.add('recipe');
+                recipeDiv.classList.add('recipe-card');
+
+                const ingredients = recipe.sections?.[0]?.components?.map(c => c.raw_text).join(', ') || 'Not listed';
+                const instructions = Array.isArray(recipe.instructions)
+                    ? recipe.instructions.map(step => step.display_text).join(' ')
+                    : 'Not available';
 
                 recipeDiv.innerHTML = `
-                    <h3>${recipe.name}</h3>
-                    <img src="${recipe.thumbnail_url}" alt="${recipe.name}">
-                    <p><strong>Ingredients:</strong> ${recipe.sections[0].components.map(c => c.raw_text).join(', ')}</p>
-                    <p><strong>Instructions:</strong> ${recipe.instructions || 'Not available'}</p>
+                    <h2>${recipe.name}</h2>
+                    <img src="${recipe.thumbnail_url}" alt="${recipe.name}" style="width:100%; border-radius:8px; margin-bottom:10px;">
+                    <p><strong>Ingredients:</strong> ${ingredients}</p>
+                    <p><strong>Instructions:</strong> ${instructions}</p>
                 `;
 
                 resultsDiv.appendChild(recipeDiv);
@@ -44,3 +50,6 @@ document.getElementById('search-button').addEventListener('click', () => {
         document.getElementById('results').innerHTML = '<p>An error occurred while fetching recipes. Please try again later.</p>';
     });
 });
+
+Let me know if you'd like the code packed in a downloadable ZIP or if you want help deploying it on GitHub Pages correctly.
+
